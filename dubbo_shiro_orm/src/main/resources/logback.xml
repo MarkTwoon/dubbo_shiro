@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration scan="true" scanPeriod="30 seconds">
+
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%-4relative [%thread] %-5level %logger{35} - %msg %n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- encoder 默认配置为PatternLayoutEncoder -->
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n
+            </pattern>
+        </encoder>
+    </appender>
+
+    <!--记录所有输出日志-->
+    <appender name="allLogFile"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${catalina.base}/logs/allLog.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${catalina.base}/logs/allLog.%d{yyyy-MM-dd}.zip</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{40} - %msg%n</Pattern>
+        </layout>
+    </appender>
+
+    <!--记录错误输出日志-->
+    <appender name="errorLogFile"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <!--过滤 Error-->
+            <level>ERROR</level>
+            <!--&lt;!&ndash;匹配到就禁止&ndash;&gt;-->
+            <!--<onMatch>DENY</onMatch>-->
+            <!--&lt;!&ndash;没有匹配到就允许&ndash;&gt;-->
+            <!--<onMismatch>ACCEPT</onMismatch>-->
+        </filter>
+        <file>${catalina.base}/logs/errorLog.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${catalina.base}/logs/errorLog.%d{yyyy-MM-dd}.zip</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{40} - %msg%n</Pattern>
+        </layout>
+    </appender>
+
+    <!--记录警告输出日志-->
+    <appender name="errorLogFile"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <!--过滤 Error-->
+            <level>WARN</level>
+            <!--&lt;!&ndash;匹配到就禁止&ndash;&gt;-->
+            <!--<onMatch>DENY</onMatch>-->
+            <!--&lt;!&ndash;没有匹配到就允许&ndash;&gt;-->
+            <!--<onMismatch>ACCEPT</onMismatch>-->
+        </filter>
+        <file>${catalina.base}/logs/warnLog.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${catalina.base}/logs/warnLog.%d{yyyy-MM-dd}.zip</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{40} - %msg%n</Pattern>
+        </layout>
+    </appender>
+
+    <!-- <logger name="com.hengbao.fundcheck.repository" level="DEBUG"/> -->
+    <!-- 以下这一句至关重要如果没有，就无法输出 sql 语句 -->
+    <!--注意：在 spring boot 中，想在控制台打印 mybatis 的 sql 语句，只需要配置下边这一句就好了。-->
+    <!--如果想要记录更详细的 SQL 日志，只需要把下面的日志级别改成 TRACE 就可以了-->
+    <!--即将 mapper 接口打入 logger 就行。-->
+    <logger name="com.chinasoft.dubbo_shiro_orm.mapper" level="TRACE"/>
+    <logger name="org.mybatis.spring" level="DEBUG" />
+    <logger name="org.apache.mybatis" level="DEBUG" />
+    <logger name="java.sql.PreparedStatement" level="DEBUG" />
+    <logger name="java.sql.Statement" level="DEBUG" />
+    <logger name="java.sql.Connection" level="DEBUG" />
+    <logger name="java.sql.ResultSet" level="DEBUG" />
+
+    <logger name="com.alibaba" level="INFO" />
+    <logger name="org.apache.commons" level="INFO" />
+    <logger name="org.apache.zookeeper" level="INFO" />
+    <logger name="org.springframework" level="INFO" />
+    <logger name="org.quartz" level="INFO" />
+
+    <root level="INFO">
+        <appender-ref ref="console" />
+        <appender-ref ref="allLogFile" />
+        <appender-ref ref="STDOUT" />
+        <!--<appender-ref ref="logFile"/>-->
+    </root>
+</configuration>

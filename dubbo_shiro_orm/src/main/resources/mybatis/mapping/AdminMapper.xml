@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper  namespace="com.chinasoft.dubbo_shiro_orm.mapper.AdminMapper">
+    <!-- 写入cache单列标签  表面在此映射中开启mybatis二级缓存-->
+    <cache  eviction="LRU"
+            flushInterval="6000000" readOnly="false" size="1024" />
+
+    <select id="getPassWord" parameterType="String" resultType="String"
+            useCache="true" flushCache="false">
+        SELECT password
+        FROM user
+        WHERE username = #{username}
+    </select>
+
+    <select id="getRole" parameterType="String" resultType="String"
+            useCache="true" flushCache="false">
+        SELECT role
+        FROM user
+        WHERE username = #{username}
+    </select>
+
+    <insert id="insertUser" parameterType="map"
+            flushCache="true">
+        insert into user
+        values(null,#{username},#{password},#{role},
+               (
+                   SELECT role.permission FROM role  WHERE role.role=#{role}
+               ),0);
+    </insert>
+
+    <update id="updatePassword" parameterType="String"
+            flushCache="true">
+        UPDATE user
+        SET password = #{password}
+        WHERE username = #{username}
+    </update>
+
+    <select id="getUser" resultType="String"
+            useCache="true" flushCache="false">
+        SELECT username
+        FROM user
+    </select>
+
+    <update id="banUser" parameterType="String"
+            flushCache="true">
+        UPDATE user
+        SET ban = 1
+        WHERE username = #{username}
+    </update>
+
+    <select id="checkUserBanStatus" parameterType="String" resultType="int"
+            useCache="true" flushCache="false">
+        SELECT ban
+        FROM user
+        WHERE username = #{username}
+    </select>
+
+    <select id="getRolePermission" parameterType="String" resultType="String"
+            useCache="true" flushCache="false">
+        SELECT role.permission
+        FROM user, role
+        WHERE username = #{username} AND role.role = user.role
+    </select>
+
+    <select id="getPermission" parameterType="String" resultType="String"
+            useCache="true" flushCache="false">
+        SELECT permission
+        FROM user
+        WHERE username = #{username}
+    </select>
+
+</mapper>

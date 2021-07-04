@@ -1,0 +1,106 @@
+package com.chinasoft.dubbo_shiro_ioc.shiro;
+
+import com.alibaba.dubbo.config.annotation.Reference;
+import com.chinasoft.dubbo_shiro_ioc.exception.MyException;
+import com.chinasoft.dubbo_shiro_ioc.exception.StatusCode;
+import com.chinasoft.dubbo_shiro_ioc.util.TokenUtil;
+import com.chinasoft.dubbo_shiro_util.service.AdminService;
+import org.apache.shiro.authc.*;
+import org.apache.shiro.authz.AuthorizationInfo;
+import org.apache.shiro.authz.SimpleAuthorizationInfo;
+import org.apache.shiro.realm.AuthorizingRealm;
+import org.apache.shiro.subject.PrincipalCollection;
+import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+/**
+ * Created with IntelliJ IDEA
+ *
+ * @Author yuanhaoyue swithaoy@gmail.com
+ * @Description 自定义 Realm
+ * @Date 2018-04-09
+ * @Time 16:58
+ */
+@Component
+public class CustomRealm extends AuthorizingRealm {
+
+    /* private final UserMapper userMapper;
+
+    @Autowired
+    public CustomRealm(UserMapper userMapper) {
+        this.userMapper = userMapper;
+    }*/
+    /*@Autowired
+    private UserService userService;*/
+    @Reference
+    private AdminService adminService;
+    /**
+     * 必须重写此方法，不然会报错
+     */
+    @Override
+    public boolean supports(AuthenticationToken token) {
+        return token instanceof JWTToken;
+    }
+
+    /**
+     * 默认使用此方法进行用户名正确与否验证，错误抛出异常即可。
+     */
+    @Override
+    protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authenticationToken) throws AuthenticationException {
+        System.out.println("————身份认证方法————");
+        String token = (String) authenticationToken.getCredentials();
+
+        // 解密获得username，用于和数据库进行对比
+        String username = TokenUtil.getAccount(token);
+        System.out.println( username+">>>>>>>>>111");
+        if (username == null ) {
+            throw new AuthenticationException("token认证失败！");
+           /* throw new MyException(StatusCode.DATA_NULL,"token认证失败！");*/
+        }
+
+        String password = adminService.getPassWord(username);
+        if (password == null) {
+            throw new AuthenticationException("该用户不存在！");
+        }
+        int ban = adminService.checkUserBanStatus(username);
+        if (ban == 1) {
+            throw new AuthenticationException("该用户已被封号！");
+        }
+        return new SimpleAuthenticationInfo(token, token,
+                "MyRealm");
+    }
+
+    /**
+     * 只有当需要检测用户权限的时候才会调用此方法，例如checkRole,checkPermission之类的
+     */
+    @Override
+    protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
+        System.out.println("————权限认证————");
+        String username = TokenUtil.getAccount(principals.toString());
+        SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
+        //获得该用户角色
+        String role = adminService.getRole(username);
+        //每个角色拥有默认的权限
+        String rolePermission = adminService.getRolePermission(username);
+        //每个用户可以设置新的权限
+        String permission = adminService.getPermission(username);
+        Set<String> roleSet = new HashSet<>();
+        Set<String> permissionSet = new HashSet<>();
+        Set<String> permissionSet2 = new HashSet<>();
+        //需要将 role, permission 封装到 Set 作为 info.setRoles(), info.setStringPermissions() 的参数
+        roleSet.add(role);
+        permissionSet.add(rolePermission);
+        permissionSet2.add(permission);
+        //设置该用户拥有的角色和权限
+        info.setRoles(roleSet);
+        info.setStringPermissions(permissionSet);
+        info.setStringPermissions(permissionSet2);
+        return info;
+    }
+}
+
