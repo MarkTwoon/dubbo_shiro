@@ -1,5 +1,8 @@
 dubbo:
   application:
+    qosEnable: true
+    qosPort: 33333
+    qosAcceptForeignIp: false
     name: dubbo-orm
   registry:
     address: 127.0.0.1:2181

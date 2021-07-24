@@ -28,8 +28,8 @@ public interface AdminMapper {
     /**
      * 修改密码
      */
-    void updatePassword(String username
-            ,String newPassword);
+    void updatePassword(@Param("username")String username
+            ,@Param("password")String newPassword);
 
     /**
      * 获得存在的用户

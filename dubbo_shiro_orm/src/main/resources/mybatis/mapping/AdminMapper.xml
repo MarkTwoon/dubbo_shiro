@@ -2,12 +2,18 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper  namespace="com.chinasoft.dubbo_shiro_orm.mapper.AdminMapper">
     <!-- 写入cache单列标签  表面在此映射中开启mybatis二级缓存-->
+    <!--<cache  eviction="LRU"
+            flushInterval="6000000" readOnly="false" size="1024" />-->
+    <!--ORM方面 开启redis的 MyBatis二级缓存 减轻后端查询与数据交互压力
+      注意**  redis-mybatis二缓 清空会：所有redis缓存 全部清空
+      所以只应在 重要大批量查询结果集中 卡定时缓存-->
     <cache  eviction="LRU"
+            type="com.chinasoft.dubbo_shiro_orm.cache.MybatisRedisCache"
             flushInterval="6000000" readOnly="false" size="1024" />
 
     <select id="getPassWord" parameterType="String" resultType="String"
             useCache="true" flushCache="false">
-        SELECT password
+        SELECT DISTINCT password
         FROM user
         WHERE username = #{username}
     </select>

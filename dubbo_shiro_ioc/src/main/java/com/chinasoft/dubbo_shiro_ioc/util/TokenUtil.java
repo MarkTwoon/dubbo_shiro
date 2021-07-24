@@ -24,7 +24,7 @@ import java.util.Date;
  */
 public class TokenUtil {
 
-    public static final long EXPIRE_TIME= 5*60*1000;//token到期时间5分钟，毫秒为单位
+    public static final long EXPIRE_TIME= 15*60*1000;//token到期时间5分钟，毫秒为单位
     public static final long REFRESH_EXPIRE_TIME=30*60;//RefreshToken到期时间为30分钟，秒为单位
     private static final String TOKEN_SECRET="ljdyaishijin**3nkjnj??";  //密钥盐
 
