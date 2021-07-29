@@ -30,6 +30,6 @@ public class ErrController implements ErrorController {
 
     @Override
     public String getErrorPath() {
-        throw new MyException(StatusCode.RETURN_ERROR,statusCode,"抱歉，请求异常！");
+        throw new MyException(StatusCode.RETURN_ERROR,statusCode,"抱歉，请求路径无法访问！");
     }
 }
